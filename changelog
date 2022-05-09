@@ -3,6 +3,8 @@ FlappyMon 0.2.3-Alpha (10/05/2022):
 - Adding sound to game
 - Adding HP mechanism
 - Adding GameOver screen
+- Optimizing Code
+- Adding choose character mechanism
 
 FlappyMon 0.2.1-Alpha :
 - Fixing collision bug
