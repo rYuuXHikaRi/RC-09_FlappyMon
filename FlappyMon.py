@@ -1,6 +1,6 @@
 import time, pygame, random
 
-from pygame import *
+from pygame import mixer
 from pygame.locals import *
 from abc import ABC, abstractmethod
 
@@ -237,6 +237,11 @@ def show_score(text,font,color,x,y):
 def is_off_screen(sprite):
     return sprite.rect[0] < -(sprite.rect[2])
 
+def show_text(text, font_size, font_colour,x,y):
+    font = pygame.font.SysFont(None,font_size)
+    font_surface = font.render(text, True,font_colour)
+    screen.blit(font_surface,(x,y))
+
 chikorita = poke1()
 fletchling = poke2()
 swablu = poke3()
@@ -340,8 +345,8 @@ while isGameRun :
             if(charSelect.getHP() == 0) :
                 die_sound = mixer.Sound(die)
                 die_sound.play()  
-                time.sleep(1)
-                isGameRun = False
+                #time.sleep(1)
+                gameState = "gameOver"
             
             charSelect.drownHP()
             charSelect.rect.x = 35
@@ -350,11 +355,11 @@ while isGameRun :
             continue
 
         if (pygame.sprite.groupcollide(pokeObject, pipe_group, False, False, pygame.sprite.collide_mask)):
-            if(charSelect.getHP() == 0) :
+            if(charSelect.getHP() <= 0) :
                 die_sound = mixer.Sound(die)
                 die_sound.play()  
-                time.sleep(1)
-                isGameRun = False
+                #time.sleep(1)
+                gameState = "gameOver"
         
             if(after_collide) :
                 after_collide_interval -= 1
@@ -369,6 +374,19 @@ while isGameRun :
         
     # while(gameState == "pauseGame") :
 
-    # while(gameState == "gameOver") :
+    while(gameState == "gameOver") :
+        screen.fill((0,0,0))
+        show_text("Game Over",40,(255, 0, 0),windowW//2 - 65,windowH//4)
+        show_text("Score Anda =  {}".format(score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
+        show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
 
+        pygame.display.flip()
+        while(gameState == "gameOver"):
+            clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == QUIT :
+                    gameState = "netralState"
+                    isGameRun = False
+                if event.type == KEYUP:
+                    gameState = "playGame"
 pygame.quit()
