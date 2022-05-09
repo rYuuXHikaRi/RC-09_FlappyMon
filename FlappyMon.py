@@ -5,24 +5,34 @@ from pygame.locals import *
 
 
 # Environment Setting
+# Sebagai "Canvas" game
 windowW = 360
 windowH = 640
 FPS = 30
 
+# Game Setting
+# Digunakan untuk men-set segala sesuatu parameter yang digunakan
+# di dalam game
+
+# Object
 Obstacle_Width=80
 Obstacle_Height=500
 Obstacle_Gap=300
+
 GROUND_HEIGHT =100
 GROUND_WIDHT =2 * windowW
 
-#font
-
-# Game Setting
+# Mechanism
 gravity = 0.5
 characterSpeed = 7.5
 GAME_SPEED=15
 score=0
 
+# Assets
+# Inisialisasi semua assets yang akan digunakan di dalam game
+
+# Font
+# Music
 # Image Resource
 backgroundGame = pygame.image.load("Assets/img/background-senja.png")
 backgroundGame = pygame.transform.scale(backgroundGame,(windowW, windowH))
