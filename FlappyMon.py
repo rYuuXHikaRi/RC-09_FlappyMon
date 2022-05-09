@@ -1,7 +1,9 @@
-from abc import ABC, abstractmethod
-import pygame,random
-import time
+import time, pygame, random
+
+from pygame import *
 from pygame.locals import *
+from abc import ABC, abstractmethod
+
 
 
 # Environment Setting
@@ -32,7 +34,13 @@ score=0
 # Inisialisasi semua assets yang akan digunakan di dalam game
 
 # Font
+
+
 # Music
+bgm = "Assets/sound/Game-Menu.wav"
+tap = "Assets/sound/swoosh.wav"
+die = "Assets/sound/die.wav"
+
 # Image Resource
 backgroundGame = pygame.image.load("Assets/img/background-senja.png")
 backgroundGame = pygame.transform.scale(backgroundGame,(windowW, windowH))
@@ -205,93 +213,110 @@ for i in range (2):
     pipe_group.add(pipes[1])
 
 
+# Main
 isGameRun = True
+gameState = "playGame" # default = menuGame
 after_collide = False
 after_collide_interval = 5
 
+# Play BGM Music
+mixer.music.load(bgm)
+mixer.music.play(-1)
+
 while isGameRun :
-    clock.tick(FPS)
+    # while(gameState == "playGame") :
 
-    for event in pygame.event.get() :
-        if(event.type == QUIT) :
-            isGameRun = False
-        if(event.type == KEYDOWN) :
-            if(event.key == K_SPACE or event.key == K_UP):
-                pikachu.moveUp()
+    while(gameState == "playGame") :
+        clock.tick(FPS)
 
-    if(pikachu.getHP() == 3) :
-        hpImg = pygame.image.load(hpSprites[2])
-        hpImg = pygame.transform.scale(hpImg, (47,20))
-    elif(pikachu.getHP() == 2) :
-        hpImg = pygame.image.load(hpSprites[1])
-        hpImg = pygame.transform.scale(hpImg, (33,20))
-    else :
-        hpImg = pygame.image.load(hpSprites[0])
-        hpImg = pygame.transform.scale(hpImg, (20,20))
-    
-    pikachu.fallMove()
-    screen.blit(backgroundGame, (0,0))
-    screen.blit(hpImg, (0,5))
-    pokeObject.update()
-    pokeObject.draw(screen)
-    screen.blit(backgroundGame, (0, 0))
-    screen.blit(hpImg, (0,5))
+        for event in pygame.event.get() :
+            if(event.type == QUIT) :
+                isGameRun = False
+            if(event.type == KEYDOWN) :
+                if(event.key == K_SPACE or event.key == K_UP):
+                    pikachu.moveUp()
+                    tap_sound = mixer.Sound(tap)
+                    tap_sound.play()
 
-    if is_off_screen(ground_group.sprites()[0]):
-        ground_group.remove(ground_group.sprites()[0])
-
-        new_ground = Ground(GROUND_WIDHT - 20,'Assets/img/bases.png')
-        ground_group.add(new_ground)
-    
-    if is_off_screen(pipe_group.sprites()[0]):
-        pipe_group.remove(pipe_group.sprites()[0])
-        pipe_group.remove(pipe_group.sprites()[0])
-
-        pipes = get_random_pipes(windowW * 2)
-
-        pipe_group.add(pipes[0])
-        pipe_group.add(pipes[1])
-
-    ground_group.update()
-    pipe_group.update()
-
-    pokeObject.draw(screen)
-    pipe_group.draw(screen)
-    ground_group.draw(screen)
-    
-
-    if len(pipe_group)>0:
-        score=pikachu.get_score(score)
-    show_score(str(score),font ,white,int(windowW/2)-30,20)
-    
-    pygame.display.update()
-    pygame.display.flip()
-    if(pygame.sprite.groupcollide(pokeObject, ground_group, False,False, pygame.sprite.collide_mask)) :
-        if(pikachu.getHP() == 0) :  
-            time.sleep(1)
-            break
-        pikachu.drownHP()
-        pikachu.rect.x = 35
-        pikachu.rect.y = int(windowH / 2) - 20
-        pikachu.speed = characterSpeed
-        continue
-
-    if (pygame.sprite.groupcollide(pokeObject, pipe_group, False, False, pygame.sprite.collide_mask)):
-        
-        if(pikachu.getHP() == 0) :  
-            time.sleep(1)
-            break
-        
-        if(after_collide) :
-            after_collide_interval -= 1
-            if(after_collide_interval == 0) :
-                after_collide = False
-                after_collide_interval = 5 
-            continue
+        if(pikachu.getHP() == 3) :
+            hpImg = pygame.image.load(hpSprites[2])
+            hpImg = pygame.transform.scale(hpImg, (47,20))
+        elif(pikachu.getHP() == 2) :
+            hpImg = pygame.image.load(hpSprites[1])
+            hpImg = pygame.transform.scale(hpImg, (33,20))
         else :
+            hpImg = pygame.image.load(hpSprites[0])
+            hpImg = pygame.transform.scale(hpImg, (20,20))
+    
+        pikachu.fallMove()
+        screen.blit(backgroundGame, (0,0))
+        screen.blit(hpImg, (0,5))
+        pokeObject.update()
+        pokeObject.draw(screen)
+        screen.blit(backgroundGame, (0, 0))
+        screen.blit(hpImg, (0,5))
+
+        if is_off_screen(ground_group.sprites()[0]):
+            ground_group.remove(ground_group.sprites()[0])
+            new_ground = Ground(GROUND_WIDHT - 20,'Assets/img/bases.png')
+            ground_group.add(new_ground)
+    
+        if is_off_screen(pipe_group.sprites()[0]):
+            pipe_group.remove(pipe_group.sprites()[0])
+            pipe_group.remove(pipe_group.sprites()[0])
+            
+            pipes = get_random_pipes(windowW * 2)
+            
+            pipe_group.add(pipes[0])
+            pipe_group.add(pipes[1])
+
+        ground_group.update()
+        pipe_group.update()
+
+        pokeObject.draw(screen)
+        pipe_group.draw(screen)
+        ground_group.draw(screen)
+    
+
+        if len(pipe_group)>0:
+            score=pikachu.get_score(score)
+        show_score(str(score),font ,white,int(windowW/2)-30,20)
+    
+        pygame.display.update()
+        pygame.display.flip()
+        if(pygame.sprite.groupcollide(pokeObject, ground_group, False,False, pygame.sprite.collide_mask)) :
+            if(pikachu.getHP() == 0) :
+                die_sound = mixer.Sound(die)
+                die_sound.play()  
+                time.sleep(1)
+                isGameRun = False
+            
             pikachu.drownHP()
-            after_collide = True
+            pikachu.rect.x = 35
+            pikachu.rect.y = int(windowH / 2) - 20
+            pikachu.speed = characterSpeed
             continue
 
+        if (pygame.sprite.groupcollide(pokeObject, pipe_group, False, False, pygame.sprite.collide_mask)):
+            if(pikachu.getHP() == 0) :
+                die_sound = mixer.Sound(die)
+                die_sound.play()  
+                time.sleep(1)
+                isGameRun = False
+        
+            if(after_collide) :
+                after_collide_interval -= 1
+                if(after_collide_interval == 0) :
+                    after_collide = False
+                    after_collide_interval = 5 
+                continue
+            else :
+                pikachu.drownHP()
+                after_collide = True
+                continue
+        
+    # while(gameState == "pauseGame") :
+
+    # while(gameState == "gameOver") :
 
 pygame.quit()
