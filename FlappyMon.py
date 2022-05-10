@@ -126,7 +126,13 @@ class poke1(character) :
 
    
     def castSkill(self) :
-        pass
+        if self.score%10==0 and self.__hp<3:
+            self.skill=True
+        if self.skill==True:
+            self.__hp+=1
+            self.skill=False
+
+
 
     def drownHP(self):
         self.__hp -= 1
@@ -251,7 +257,7 @@ swablu = poke3()
 
 pokeObject = pygame.sprite.Group()
 
-charSelect = fletchling
+charSelect = chikorita
 for i in range(len(bgGameSprites)) :
     if(i == int(charSelect.getID()) - 1) :
         bgGame = pygame.image.load(bgGameSprites[i])
