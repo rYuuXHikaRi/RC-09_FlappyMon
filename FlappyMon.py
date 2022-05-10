@@ -60,7 +60,7 @@ hpSprites = ["Assets/img/hp1.png",
 
 pygame.init()
 
-font = pygame.font.SysFont('Bauhaus 93',45)
+font = pygame.font.SysFont(fntGame,45)
 white=(255,234,0 )
 screen = pygame.display.set_mode((windowW, windowH))
 pygame.display.set_caption("FlappyMon - 0.2.3-Alpha")
