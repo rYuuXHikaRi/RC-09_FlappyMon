@@ -1,4 +1,4 @@
-import time, pygame, random
+import pygame, random
 
 from pygame import mixer
 from pygame.locals import *
