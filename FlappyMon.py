@@ -90,16 +90,11 @@ class character(pygame.sprite.Sprite, ABC) :
         if Pos_Detection== True: 
             if pokeObject.sprites()[0].rect.left < pipe_group.sprites()[0].rect.right:
 
-<<<<<<< Updated upstream
-                self.score+=1
-
-=======
                 point+=1
                 print(point)
                 
         return point
          
->>>>>>> Stashed changes
     @abstractmethod
     def castSkill() :
         pass
