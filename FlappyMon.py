@@ -5,7 +5,6 @@ from pygame.locals import *
 from abc import ABC, abstractmethod
 
 
-
 # Environment Setting
 # Sebagai "Canvas" game
 windowW = 360
