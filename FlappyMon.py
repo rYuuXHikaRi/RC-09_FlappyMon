@@ -28,7 +28,7 @@ GROUND_WIDHT =2 * windowW
 gravity = 0.5
 characterSpeed = 7.5
 GAME_SPEED=15
-score=0
+
 
 # Assets
 # Inisialisasi semua assets yang akan digunakan di dalam game
@@ -60,7 +60,7 @@ hpSprites = ["Assets/img/hp1.png",
 
 pygame.init()
 
-font = pygame.font.SysFont('Bauhaus 93',45)
+font = pygame.font.SysFont(fntGame,45)
 white=(255,234,0 )
 screen = pygame.display.set_mode((windowW, windowH))
 pygame.display.set_caption("FlappyMon - 0.2.3-Alpha")
@@ -69,7 +69,8 @@ clock = pygame.time.Clock()
 class character(pygame.sprite.Sprite, ABC) :
     def __init__(self) :
         super().__init__()
-
+        self.skill=False
+        self.score=0
         self.speed = characterSpeed
 
     def fallMove(self) :
@@ -81,7 +82,7 @@ class character(pygame.sprite.Sprite, ABC) :
     def moveUp(self) :
         self.speed = -characterSpeed
 
-    def get_score(self,point):
+    def get_score(self):
         Pos_Detection=False
         if pokeObject.sprites()[0].rect.left>pipe_group.sprites()[0].rect.left\
             and pokeObject.sprites()[0].rect.right<pipe_group.sprites()[0].rect.right\
@@ -90,11 +91,8 @@ class character(pygame.sprite.Sprite, ABC) :
         if Pos_Detection== True: 
             if pokeObject.sprites()[0].rect.left < pipe_group.sprites()[0].rect.right:
 
-                point+=1
-                print(point)
-                
-        return point
-         
+                self.score+=1
+    print("test")
 
     @abstractmethod
     def castSkill() :
@@ -120,15 +118,22 @@ class poke1(character) :
         self.images = [pygame.image.load("Assets/img/chikorita_up.png").convert_alpha(), 
                        pygame.image.load("Assets/img/chikorita_normal.png").convert_alpha(), 
                        pygame.image.load("Assets/img/chikorita_down.png").convert_alpha()]
-                       
         self.current_img = 0
         self.image = self.images[self.current_img]
         self.rect = self.image.get_rect()
         self.rect.x = 35
         self.rect.y = int(windowH / 2)
+                       
+
    
     def castSkill(self) :
-        pass
+        if self.score%10==0 and self.__hp<3:
+            self.skill=True
+        if self.skill==True:
+            self.__hp+=1
+            self.skill=False
+
+
 
     def drownHP(self):
         self.__hp -= 1
@@ -155,7 +160,12 @@ class poke2(character) :
         self.rect.y = int(windowH / 2)
     
     def castSkill(self) :
-        pass
+        if self.score%10==0 and self.score>0:
+            self.skill=True
+        elif((self.score-6)%10==0):
+            self.skill=False
+        if self.skill==True:
+            self.get_score()
 
     def drownHP(self):
         self.__hp -= 1
@@ -334,10 +344,10 @@ while isGameRun :
         pipe_group.draw(screen)
         ground_group.draw(screen)
     
-
+        charSelect.castSkill()
         if len(pipe_group)>0:
-            score=charSelect.get_score(score)
-        show_score(str(score),font ,white,int(windowW/2)-30,20)
+            charSelect.get_score()
+        show_score(str(charSelect.score),font ,white,int(windowW/2)-30,20)
     
         pygame.display.update()
         pygame.display.flip()
@@ -375,7 +385,7 @@ while isGameRun :
     while(gameState == "gameOver") :
         screen.fill((0,0,0))
         show_text("Game Over",40,(255, 0, 0),windowW//2 - 65,windowH//4)
-        show_text("Score Anda =  {}".format(score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
+        show_text("Score Anda =  {}".format(charSelect.score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
         show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
 
         pygame.display.flip()
