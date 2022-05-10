@@ -200,9 +200,7 @@ class poke3(character) :
             self.skill=True
             self.last_hp=self.__hp
         elif((self.score-6)%10==0 and self.score>10):
-            print('d')
             self.skill=False
-
         if self.skill==True:
             self.__hp=self.last_hp    
 
