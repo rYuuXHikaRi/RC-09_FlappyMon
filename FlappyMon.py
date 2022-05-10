@@ -41,7 +41,7 @@ tap = "Assets/sound/fly.wav"
 die = "Assets/sound/die.wav"
 bgmStageGame = ["Assets/sound/BG-twilight.wav",
                 "Assets/sound/BG-Hellzone.wav",
-                "Assets/sound/BG-twilight.wav"]
+                "Assets/sound/BG-iceage.wav"]
 # Image Resource
 bgGameSprites = ["Assets/img/bg-twill.png",
                  "Assets/img/bg-lava.png",
@@ -66,6 +66,8 @@ menuSprites = ["Assets/img/menu_header_title.png",
                "Assets/img/menu_btn_start_hover.png",
                "Assets/img/menu_btn_quit_normal.png",
                "Assets/img/menu_btn_quit_hover.png"]
+transparentBg = pygame.image.load("Assets/img/bg_transparent.png")
+transparentBg = pygame.transform.scale(transparentBg, (windowW, windowH))
 
 pygame.init()
 
@@ -473,7 +475,8 @@ while isGameRun :
                     tap_sound = mixer.Sound(tap)
                     tap_sound.play()
                 elif event.key == pygame.K_p:
-                    pause()
+                    #pause()
+                    gameState = "pauseGame"
 
         if(charSelect.getHP() == 3) :
             hpImg = pygame.image.load(hpSprites[2])
@@ -549,8 +552,29 @@ while isGameRun :
                 charSelect.drownHP()
                 after_collide = True
                 continue
-        
-    # while(gameState == "pauseGame") :
+
+    isPauseRunOnce = True    
+    while(gameState == "pauseGame") :
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameState = "netralState"
+                isGameRun = False
+            if event.type==pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    gameState = "playGame"
+                elif event.key == pygame.K_q:
+                    gameState = "netralState"
+                    isGameRun = False
+
+        screen.blit(transparentBg, (0, 0))
+        show_text("Paused", 40, (255,255,255), windowW//2 -50,windowH//3)
+        show_text("Press C to continue or Q to quit.", 25, (255,255,255),windowW//8 ,windowH//2.5)
+        while isPauseRunOnce :
+            pygame.display.update()
+            isPauseRunOnce = False
+
+        clock.tick(5)
+
     mixer.music.stop()
     while(gameState == "gameOver") :
         screen.fill((0,0,0))
