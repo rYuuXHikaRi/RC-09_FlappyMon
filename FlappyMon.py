@@ -237,10 +237,13 @@ class Ground(pygame.sprite.Sprite):
     def update(self):
         self.rect[0] -= GAME_SPEED
 
-def get_random_pipes(xpos):
+def get_random_pipes(xpos, choosenCharacter):
     size = random.randint(100, 300)
-    Obs = Obstacle(False, xpos, size,'Assets/img/obs-twill.png')
-    Obs_inverted = Obstacle(True, xpos, windowH - size - Obstacle_Gap,'Assets/img/obs-twill.png')
+    for i in range(len(obstacleSprites)) :
+        if(i == int(choosenCharacter.getID()) - 1) :
+            Obs = Obstacle(False, xpos, size,obstacleSprites[i])
+            Obs_inverted = Obstacle(True, xpos, windowH - size - Obstacle_Gap,obstacleSprites[i])
+            break
     return Obs, Obs_inverted
 
 def show_score(text,font,color,x,y):
@@ -261,7 +264,7 @@ swablu = poke3()
 
 pokeObject = pygame.sprite.Group()
 
-charSelect = chikorita
+charSelect = swablu 
 for i in range(len(bgGameSprites)) :
     if(i == int(charSelect.getID()) - 1) :
         bgGame = pygame.image.load(bgGameSprites[i])
@@ -273,12 +276,15 @@ pokeObject.add(charSelect)
 ground_group = pygame.sprite.Group()
 
 for i in range (2):
-    ground = Ground(GROUND_WIDHT * i,'Assets/img/grdbase-twill.png')
+    for j in range(len(baseGroundSprites)) :
+        if(j == int(charSelect.getID()) - 1) :
+            ground = Ground(GROUND_WIDHT * i, baseGroundSprites[j])
+            break
     ground_group.add(ground)
 
 pipe_group = pygame.sprite.Group()
 for i in range (2):
-    pipes = get_random_pipes(windowW * i + 800)
+    pipes = get_random_pipes(windowW * i + 800, charSelect)
     pipe_group.add(pipes[0])
     pipe_group.add(pipes[1])
 
@@ -328,14 +334,17 @@ while isGameRun :
 
         if is_off_screen(ground_group.sprites()[0]):
             ground_group.remove(ground_group.sprites()[0])
-            new_ground = Ground(GROUND_WIDHT - 20,'Assets/img/grdbase-twill.png')
+            for i in range(len(baseGroundSprites)) :
+                if(i == int(charSelect.getID()) - 1) :
+                    new_ground = Ground(GROUND_WIDHT - 20, baseGroundSprites[i])
+                    break
             ground_group.add(new_ground)
     
         if is_off_screen(pipe_group.sprites()[0]):
             pipe_group.remove(pipe_group.sprites()[0])
             pipe_group.remove(pipe_group.sprites()[0])
             
-            pipes = get_random_pipes(windowW * 2)
+            pipes = get_random_pipes(windowW * 2, charSelect)
             
             pipe_group.add(pipes[0])
             pipe_group.add(pipes[1])
