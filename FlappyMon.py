@@ -91,7 +91,6 @@ class character(pygame.sprite.Sprite, ABC) :
             if pokeObject.sprites()[0].rect.left < pipe_group.sprites()[0].rect.right:
 
                 self.score+=1
-    print("test")
 
     @abstractmethod
     def castSkill() :
