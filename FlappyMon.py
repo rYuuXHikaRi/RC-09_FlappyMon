@@ -1,4 +1,5 @@
-import time, pygame, random
+import pygame, random
+
 from pygame import mixer
 from pygame.locals import *
 from abc import ABC, abstractmethod
@@ -354,7 +355,6 @@ while isGameRun :
             if(charSelect.getHP() == 0) :
                 die_sound = mixer.Sound(die)
                 die_sound.play()  
-                #time.sleep(1)
                 gameState = "gameOver"
             
             charSelect.drownHP()
@@ -367,7 +367,6 @@ while isGameRun :
             if(charSelect.getHP() <= 0) :
                 die_sound = mixer.Sound(die)
                 die_sound.play()  
-                #time.sleep(1)
                 gameState = "gameOver"
         
             if(after_collide) :
@@ -396,6 +395,7 @@ while isGameRun :
                 if event.type == QUIT :
                     gameState = "netralState"
                     isGameRun = False
+
                 if event.type == KEYUP:
                     gameState = "playGame"
 pygame.quit()
