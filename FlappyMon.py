@@ -1,4 +1,5 @@
 import pygame, random
+
 from pygame import mixer
 from pygame.locals import *
 from abc import ABC, abstractmethod
@@ -38,9 +39,6 @@ fntGame = "Assets/font/FlappyBirdy.ttf"
 bgm = "Assets/sound/Game-Menu.wav"
 tap = "Assets/sound/swoosh.wav"
 die = "Assets/sound/die.wav"
-bgState = ["Assets/sound/BG-twilight.wav",
-           "Assets/sound/BG-hellzone.wav",
-           "Assets/sound/Game-menu.wav"]
 
 # Image Resource
 bgGameSprites = ["Assets/img/bg-twill.png",
@@ -62,7 +60,7 @@ hpSprites = ["Assets/img/hp1.png",
 pygame.init()
 
 font = pygame.font.SysFont(fntGame,45)
-white=(255,234,0 )
+white=(0,0,0 )
 screen = pygame.display.set_mode((windowW, windowH))
 pygame.display.set_caption("FlappyMon - 0.2.3-Alpha")
 clock = pygame.time.Clock()
@@ -197,7 +195,8 @@ class poke3(character) :
         self.rect.y = int(windowH / 2)
     
     def castSkill(self) :
-        pass
+        if(self.score%10==0):
+            self.skill=True
 
     def drownHP(self):
         self.__hp -= 1
@@ -227,7 +226,6 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect[0] -= GAME_SPEED
 
 class Ground(pygame.sprite.Sprite):
-    
     def __init__(self, xpos,image_dir):
         super().__init__()
         self.image = pygame.image.load(image_dir).convert_alpha()
@@ -239,13 +237,10 @@ class Ground(pygame.sprite.Sprite):
     def update(self):
         self.rect[0] -= GAME_SPEED
 
-def get_random_pipes(xpos, choosenCharacter):
+def get_random_pipes(xpos):
     size = random.randint(100, 300)
-    for i in range(len(obstacleSprites)) :
-        if(i == int(choosenCharacter.getID()) - 1) :
-            Obs = Obstacle(False, xpos, size,obstacleSprites[i])
-            Obs_inverted = Obstacle(True, xpos, windowH - size - Obstacle_Gap,obstacleSprites[i])
-            break
+    Obs = Obstacle(False, xpos, size,'Assets/img/obs-twill.png')
+    Obs_inverted = Obstacle(True, xpos, windowH - size - Obstacle_Gap,'Assets/img/obs-twill.png')
     return Obs, Obs_inverted
 
 def show_score(text,font,color,x,y):
@@ -260,13 +255,33 @@ def show_text(text, font_size, font_colour,x,y):
     font_surface = font.render(text, True,font_colour)
     screen.blit(font_surface,(x,y))
 
+def pause():
+    paused = True
+    
+    while paused :
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type==pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    paused = False
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    quit()
+        screen.fill(white)
+        show_text("Paused", 40, (255,255,255), windowW//2 -50,windowH//3)
+        show_text("Press C to continue or Q to quit.", 25, (255,255,255),windowW//8 ,windowH//2.5)
+        pygame.display.update()
+        clock.tick(5)
+
 chikorita = poke1()
 fletchling = poke2()
 swablu = poke3()
 
 pokeObject = pygame.sprite.Group()
 
-charSelect = chikorita 
+charSelect = chikorita
 for i in range(len(bgGameSprites)) :
     if(i == int(charSelect.getID()) - 1) :
         bgGame = pygame.image.load(bgGameSprites[i])
@@ -278,15 +293,12 @@ pokeObject.add(charSelect)
 ground_group = pygame.sprite.Group()
 
 for i in range (2):
-    for j in range(len(baseGroundSprites)) :
-        if(j == int(charSelect.getID()) - 1) :
-            ground = Ground(GROUND_WIDHT * i, baseGroundSprites[j])
-            break
+    ground = Ground(GROUND_WIDHT * i,'Assets/img/grdbase-twill.png')
     ground_group.add(ground)
 
 pipe_group = pygame.sprite.Group()
 for i in range (2):
-    pipes = get_random_pipes(windowW * i + 800, charSelect)
+    pipes = get_random_pipes(windowW * i + 800)
     pipe_group.add(pipes[0])
     pipe_group.add(pipes[1])
 
@@ -298,11 +310,8 @@ after_collide = False
 after_collide_interval = 4
 
 # Play BGM Music
-for i in range(len(bgState)) :
-    if(i == int(charSelect.getID()) - 1) :
-        mixer.music.load(bgState[i])
-        mixer.music.play(-1)
-        break
+mixer.music.load(bgm)
+mixer.music.play(-1)
 
 while isGameRun :
     # while(gameState == "playGame") :
@@ -318,6 +327,8 @@ while isGameRun :
                     charSelect.moveUp()
                     tap_sound = mixer.Sound(tap)
                     tap_sound.play()
+                elif event.key == pygame.K_p:
+                    pause()
 
         if(charSelect.getHP() == 3) :
             hpImg = pygame.image.load(hpSprites[2])
@@ -331,25 +342,22 @@ while isGameRun :
     
         charSelect.fallMove()
         screen.blit(bgGame, (0,0))
-        
+        screen.blit(hpImg, (0,5))
         pokeObject.update()
         pokeObject.draw(screen)
         screen.blit(bgGame, (0, 0))
-        
+        screen.blit(hpImg, (0,5))
 
         if is_off_screen(ground_group.sprites()[0]):
             ground_group.remove(ground_group.sprites()[0])
-            for i in range(len(baseGroundSprites)) :
-                if(i == int(charSelect.getID()) - 1) :
-                    new_ground = Ground(GROUND_WIDHT - 20, baseGroundSprites[i])
-                    break
+            new_ground = Ground(GROUND_WIDHT - 20,'Assets/img/grdbase-twill.png')
             ground_group.add(new_ground)
     
         if is_off_screen(pipe_group.sprites()[0]):
             pipe_group.remove(pipe_group.sprites()[0])
             pipe_group.remove(pipe_group.sprites()[0])
             
-            pipes = get_random_pipes(windowW * 2, charSelect)
+            pipes = get_random_pipes(windowW * 2)
             
             pipe_group.add(pipes[0])
             pipe_group.add(pipes[1])
@@ -360,13 +368,11 @@ while isGameRun :
         pokeObject.draw(screen)
         pipe_group.draw(screen)
         ground_group.draw(screen)
-        screen.blit(hpImg, (0,5))
-        screen.blit(hpImg, (0,5))
     
         charSelect.castSkill()
         if len(pipe_group)>0:
             charSelect.get_score()
-        show_score(str(charSelect.score),font ,white,int(windowW/2)-30,20)
+        show_score(str(charSelect.score),font ,(255,234,0),int(windowW/2)-30,20)
     
         pygame.display.update()
         pygame.display.flip()
