@@ -253,7 +253,7 @@ def show_text(text, font_size, font_colour,x,y):
     font = pygame.font.SysFont(None,font_size)
     font_surface = font.render(text, True,font_colour)
     screen.blit(font_surface,(x,y))
-
+print('test')
 def pause():
     paused = True
     
