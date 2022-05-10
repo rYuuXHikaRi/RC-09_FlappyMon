@@ -1,5 +1,4 @@
 import pygame, random
-
 from pygame import mixer
 from pygame.locals import *
 from abc import ABC, abstractmethod
@@ -39,6 +38,9 @@ fntGame = "Assets/font/FlappyBirdy.ttf"
 bgm = "Assets/sound/Game-Menu.wav"
 tap = "Assets/sound/swoosh.wav"
 die = "Assets/sound/die.wav"
+bgState = ["Assets/sound/BG-twilight.wav",
+           "Assets/sound/BG-hellzone.wav",
+           "Assets/sound/Game-menu.wav"]
 
 # Image Resource
 bgGameSprites = ["Assets/img/bg-twill.png",
@@ -264,7 +266,7 @@ swablu = poke3()
 
 pokeObject = pygame.sprite.Group()
 
-charSelect = swablu 
+charSelect = chikorita 
 for i in range(len(bgGameSprites)) :
     if(i == int(charSelect.getID()) - 1) :
         bgGame = pygame.image.load(bgGameSprites[i])
@@ -296,8 +298,11 @@ after_collide = False
 after_collide_interval = 4
 
 # Play BGM Music
-mixer.music.load(bgm)
-mixer.music.play(-1)
+for i in range(len(bgState)) :
+    if(i == int(charSelect.getID()) - 1) :
+        mixer.music.load(bgState[i])
+        mixer.music.play(-1)
+        break
 
 while isGameRun :
     # while(gameState == "playGame") :
