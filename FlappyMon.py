@@ -254,6 +254,25 @@ def show_text(text, font_size, font_colour,x,y):
     font_surface = font.render(text, True,font_colour)
     screen.blit(font_surface,(x,y))
 
+def pause():
+    paused = True
+    
+    while paused :
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type==pygame.KEYDOWN:
+                if event.key == pygame.K_c:
+                    paused = False
+                elif event.key == pygame.K_q:
+                    pygame.quit()
+                    quit()
+        screen.fill(white)
+        show_text("Paused", 40, (255,255,255), windowW//2 -50,windowH//3)
+        show_text("Press C to continue or Q to quit.", 25, (255,255,255),windowW//8 ,windowH//2.5)
+        pygame.display.update()
+        clock.tick(5)
 
 chikorita = poke1()
 fletchling = poke2()
@@ -307,7 +326,9 @@ while isGameRun :
                     charSelect.moveUp()
                     tap_sound = mixer.Sound(tap)
                     tap_sound.play()
-                
+                elif event.key == pygame.K_p:
+                    pause()
+
         if(charSelect.getHP() == 3) :
             hpImg = pygame.image.load(hpSprites[2])
             hpImg = pygame.transform.scale(hpImg, (47,20))
