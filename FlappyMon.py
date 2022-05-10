@@ -36,8 +36,8 @@ GAME_SPEED=15
 fntGame = "Assets/font/FlappyBirdy.ttf"
 
 # Music
-bgm = "Assets/sound/Game-Menu.wav"
-tap = "Assets/sound/swoosh.wav"
+bgm = "Assets/sound/BG-twilight.wav"
+tap = "Assets/sound/fly.wav"
 die = "Assets/sound/die.wav"
 
 # Image Resource
@@ -90,8 +90,11 @@ class character(pygame.sprite.Sprite, ABC) :
         if Pos_Detection== True: 
             if pokeObject.sprites()[0].rect.left < pipe_group.sprites()[0].rect.right:
 
-                self.score+=1
-
+                point+=1
+                print(point)
+                
+        return point
+         
     @abstractmethod
     def castSkill() :
         pass
