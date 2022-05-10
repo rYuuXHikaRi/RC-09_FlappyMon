@@ -57,6 +57,14 @@ hpSprites = ["Assets/img/hp1.png",
              "Assets/img/hp2.png",
              "Assets/img/hp3.png"]
 
+menuSprites = ["Assets/img/menu_header_title.png",
+               "Assets/img/menu_btn_start.png",
+               "Assets/img/menu_btn_quit.png",
+               "Assets/img/menu_btn_start_normal.png",
+               "Assets/img/menu_btn_start_hover.png",
+               "Assets/img/menu_btn_quit_normal.png",
+               "Assets/img/menu_btn_quit_hover.png"]
+
 pygame.init()
 
 font = pygame.font.SysFont(fntGame,45)
@@ -206,9 +214,6 @@ class poke3(character) :
         if self.skill==True:
             self.__hp=self.last_hp    
 
-   
-
-
     def drownHP(self):
         self.__hp -= 1
         return 1
@@ -238,8 +243,12 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect[0] -= GAME_SPEED
 
 class Ground(pygame.sprite.Sprite):
-    def __init__(self, xpos,image_dir):
+    def __init__(self, xpos, choosenCharacter):
         super().__init__()
+        for i in range(len(baseGroundSprites)) :
+            if(i == int(choosenCharacter.getID()) - 1) :
+                image_dir = baseGroundSprites[i]
+                break
         self.image = pygame.image.load(image_dir).convert_alpha()
         self.image = pygame.transform.scale(self.image, (GROUND_WIDHT, GROUND_HEIGHT))
 
@@ -249,10 +258,13 @@ class Ground(pygame.sprite.Sprite):
     def update(self):
         self.rect[0] -= GAME_SPEED
 
-def get_random_pipes(xpos):
+def get_random_pipes(xpos, obstacleAssets):
     size = random.randint(100, 300)
-    Obs = Obstacle(False, xpos, size,'Assets/img/obs-twill.png')
-    Obs_inverted = Obstacle(True, xpos, windowH - size - Obstacle_Gap,'Assets/img/obs-twill.png')
+    for i in range(len(obstacleSprites)) :
+        if(i == int(obstacleAssets.getID()) - 1) :
+            Obs = Obstacle(False, xpos, size, obstacleSprites[i])
+            Obs_inverted = Obstacle(True, xpos, windowH - size - Obstacle_Gap, obstacleSprites[i])
+            break
     return Obs, Obs_inverted
 
 def show_score(text,font,color,x,y):
@@ -305,19 +317,19 @@ pokeObject.add(charSelect)
 ground_group = pygame.sprite.Group()
 
 for i in range (2):
-    ground = Ground(GROUND_WIDHT * i,'Assets/img/grdbase-twill.png')
+    ground = Ground(GROUND_WIDHT * i,charSelect)
     ground_group.add(ground)
 
 pipe_group = pygame.sprite.Group()
 for i in range (2):
-    pipes = get_random_pipes(windowW * i + 800)
+    pipes = get_random_pipes(windowW * i + 800, charSelect)
     pipe_group.add(pipes[0])
     pipe_group.add(pipes[1])
 
 
 # Main
 isGameRun = True
-gameState = "playGame" # default = menuGame
+gameState = "menuGame" # default = menuGame
 after_collide = False
 after_collide_interval = 4
 
@@ -325,8 +337,50 @@ after_collide_interval = 4
 mixer.music.load(bgm)
 mixer.music.play(-1)
 
+bgMenuGame = pygame.image.load(bgGameSprites[random.randint(0, 2)])
+bgMenuGame = pygame.transform.scale(bgMenuGame,(windowW, windowH))
+
 while isGameRun :
-    # while(gameState == "playGame") :
+    while(gameState == "menuGame") :
+        screen.blit(bgMenuGame, (0,0))
+
+        menu_mouse_POS = pygame.mouse.get_pos()
+        menu_Text = pygame.image.load(menuSprites[0])
+        menu_Rect = menu_Text.get_rect(center=(windowW / 2, 214))
+
+        btn_play = pygame.image.load(menuSprites[3])
+        btn_play_Rect = btn_play.get_rect(center=(windowW / 2, 346))
+        btn_quit = pygame.image.load(menuSprites[5])
+        btn_quit_Rect = btn_quit.get_rect(center=(windowW / 2, 418))
+
+        screen.blit(menu_Text, menu_Rect)
+        screen.blit(btn_play, btn_play_Rect)
+        screen.blit(btn_quit, btn_quit_Rect)
+
+        if(menu_mouse_POS[0] in range(btn_play_Rect.left, btn_play_Rect.right) and 
+           menu_mouse_POS[1] in range(btn_play_Rect.top, btn_play_Rect.bottom)) :
+            btn_play = pygame.image.load(menuSprites[4])
+            screen.blit(btn_play, btn_play_Rect)
+        
+        if(menu_mouse_POS[0] in range(btn_quit_Rect.left, btn_play_Rect.right) and 
+           menu_mouse_POS[1] in range(btn_quit_Rect.top, btn_quit_Rect.bottom)) :
+            btn_quit = pygame.image.load(menuSprites[6])
+            screen.blit(btn_quit, btn_quit_Rect)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                gameState = "netralState"
+                isGameRun = False
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if(menu_mouse_POS[0] in range(btn_play_Rect.left, btn_play_Rect.right) and menu_mouse_POS[1] in range(btn_play_Rect.top, btn_play_Rect.bottom)) :
+                gameState = "playGame"
+        
+            if(menu_mouse_POS[0] in range(btn_quit_Rect.left, btn_play_Rect.right) and menu_mouse_POS[1] in range(btn_quit_Rect.top, btn_quit_Rect.bottom)) :
+                gameState = "netralState"
+                isGameRun = False
+
+        pygame.display.update()
 
     while(gameState == "playGame") :
         clock.tick(FPS)
@@ -362,14 +416,14 @@ while isGameRun :
 
         if is_off_screen(ground_group.sprites()[0]):
             ground_group.remove(ground_group.sprites()[0])
-            new_ground = Ground(GROUND_WIDHT - 20,'Assets/img/grdbase-twill.png')
+            new_ground = Ground(GROUND_WIDHT - 20, charSelect)
             ground_group.add(new_ground)
     
         if is_off_screen(pipe_group.sprites()[0]):
             pipe_group.remove(pipe_group.sprites()[0])
             pipe_group.remove(pipe_group.sprites()[0])
             
-            pipes = get_random_pipes(windowW * 2)
+            pipes = get_random_pipes(windowW * 2, charSelect)
             
             pipe_group.add(pipes[0])
             pipe_group.add(pipes[1])
