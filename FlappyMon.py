@@ -171,6 +171,7 @@ class poke2(character) :
 
     def drownHP(self):
         self.__hp -= 1
+        
     
     def getHP(self) :
         return self.__hp
@@ -183,6 +184,7 @@ class poke3(character) :
         super().__init__()
         self.__hp = 3
         self.__idObject = "003"
+        self.last_hp=0
         self.images = [pygame.image.load("Assets/img/swablue_up.png").convert_alpha(), 
                        pygame.image.load("Assets/img/swablue_normal.png").convert_alpha(), 
                        pygame.image.load("Assets/img/swablue_down.png").convert_alpha()]
@@ -194,12 +196,23 @@ class poke3(character) :
         self.rect.y = int(windowH / 2)
     
     def castSkill(self) :
-        if(self.score%10==0):
+        if self.score%10==0 and self.score>0 :
             self.skill=True
+            self.last_hp=self.__hp
+        elif((self.score-6)%10==0 and self.score>10):
+            print('d')
+            self.skill=False
+
+        if self.skill==True:
+            self.__hp=self.last_hp    
+
+   
+
 
     def drownHP(self):
         self.__hp -= 1
-
+        return 1
+   
     def getHP(self) :
         return self.__hp
 
@@ -280,7 +293,7 @@ swablu = poke3()
 
 pokeObject = pygame.sprite.Group()
 
-charSelect = chikorita
+charSelect = swablu
 for i in range(len(bgGameSprites)) :
     if(i == int(charSelect.getID()) - 1) :
         bgGame = pygame.image.load(bgGameSprites[i])
