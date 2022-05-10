@@ -331,11 +331,11 @@ while isGameRun :
     
         charSelect.fallMove()
         screen.blit(bgGame, (0,0))
-        screen.blit(hpImg, (0,5))
+        
         pokeObject.update()
         pokeObject.draw(screen)
         screen.blit(bgGame, (0, 0))
-        screen.blit(hpImg, (0,5))
+        
 
         if is_off_screen(ground_group.sprites()[0]):
             ground_group.remove(ground_group.sprites()[0])
@@ -360,6 +360,8 @@ while isGameRun :
         pokeObject.draw(screen)
         pipe_group.draw(screen)
         ground_group.draw(screen)
+        screen.blit(hpImg, (0,5))
+        screen.blit(hpImg, (0,5))
     
         charSelect.castSkill()
         if len(pipe_group)>0:
