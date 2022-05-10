@@ -32,7 +32,6 @@ GAME_SPEED=15
 
 # Assets
 # Inisialisasi semua assets yang akan digunakan di dalam game
-
 # Font
 fntGame = "Assets/font/FlappyBirdy.ttf"
 
@@ -128,10 +127,14 @@ class poke1(character) :
    
     def castSkill(self) :
         if self.score%10==0 and self.__hp<3:
-            self.skill=True
-        if self.skill==True:
-            self.__hp+=1
-            self.skill=False
+            Pos_Detection=False
+            if pokeObject.sprites()[0].rect.left>pipe_group.sprites()[0].rect.left\
+                and pokeObject.sprites()[0].rect.right<pipe_group.sprites()[0].rect.right\
+                    and Pos_Detection==False:
+                        Pos_Detection=True
+            if Pos_Detection== True: 
+                if pokeObject.sprites()[0].rect.left < pipe_group.sprites()[0].rect.right:
+                    self.__hp+=1
 
 
 
