@@ -1,3 +1,5 @@
+from cgi import test
+from turtle import delay
 import pygame, random
 
 from pygame import mixer
@@ -355,12 +357,12 @@ while isGameRun :
 
         menu_mouse_POS = pygame.mouse.get_pos()
         menu_Text = pygame.image.load(menuSprites[0])
-        menu_Rect = menu_Text.get_rect(center=(windowW / 2, 214))
+        menu_Rect = menu_Text.get_rect(center=(windowW / 2, 100))
 
         btn_play = pygame.image.load(menuSprites[3])
-        btn_play_Rect = btn_play.get_rect(center=(windowW / 2, 346))
+        btn_play_Rect = btn_play.get_rect(center=(windowW / 2, 280))
         btn_quit = pygame.image.load(menuSprites[5])
-        btn_quit_Rect = btn_quit.get_rect(center=(windowW / 2, 418))
+        btn_quit_Rect = btn_quit.get_rect(center=(windowW / 2, 370))
 
         screen.blit(menu_Text, menu_Rect)
         screen.blit(btn_play, btn_play_Rect)
@@ -393,6 +395,7 @@ while isGameRun :
     
     bgMenuGame = pygame.image.load(bgGameSprites[random.randint(0, 2)])
     bgMenuGame = pygame.transform.scale(bgMenuGame,(windowW, windowH))
+    delay_menu = 50
     while(gameState == "chooseCharacter") :
         screen.blit(bgMenuGame, (0,0))
 
@@ -416,8 +419,11 @@ while isGameRun :
             if event.type == pygame.QUIT:
                 gameState = "netralState"
                 isGameRun = False
-        
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if(delay_menu > 0) :
+            delay_menu -= 1
+            print(delay_menu)
+            pygame.display.update()
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             if(select_mouse_POS[0] in range(btn_chiko_Rect.left, btn_chiko_Rect.right) and 
                select_mouse_POS[1] in range(btn_chiko_Rect.top, btn_chiko_Rect.bottom)) :
                 gameState = "playGame"
@@ -488,19 +494,24 @@ while isGameRun :
             break
     while(gameState == "playGame") :
         clock.tick(FPS)
-
-
+        
+        play_menu_POS = pygame.mouse.get_pos()
         for event in pygame.event.get() :
             if(event.type == QUIT) :
+                gameState = "netralState"
                 isGameRun = False
             if(event.type == KEYDOWN) :
-                if(event.key == K_SPACE or event.key == K_UP):
+                if(event.key == K_SPACE or event.key == K_UP) :
                     charSelect.moveUp()
                     tap_sound = mixer.Sound(tap)
                     tap_sound.play()
                 elif event.key == pygame.K_p:
                     #pause()
                     gameState = "pauseGame"
+            if(event.type == pygame.MOUSEBUTTONDOWN) :
+                charSelect.moveUp()
+                tap_sound = mixer.Sound(tap)
+                tap_sound.play()
 
         if(charSelect.getHP() == 3) :
             hpImg = pygame.image.load(hpSprites[2])
