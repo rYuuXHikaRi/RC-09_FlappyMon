@@ -607,10 +607,10 @@ while isGameRun :
         show_text("Score Anda =  {}".format(charSelect.score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
         show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
         if charSelect.score > int(load_Highscore(HS)):
-            show_text("New Highscore = "+str(charSelect.score),25,(255,255,255),windowW//2 - 45,windowH//4 + 150 )
+            show_text("New Highscore = "+str(charSelect.score),30,(255,255,255),windowW//2 - 75,windowH//4 + 150 )
             change_highscore(charSelect.score)
         else:    
-            show_text("HighScore = "+str(load_Highscore(HS)),25,(255,255,255),windowW//2 - 45,windowH//4 + 150 )
+            show_text("HighScore = "+str(load_Highscore(HS)),30,(255,255,255),windowW//2 - 55,windowH//4 + 150 )
 
         pygame.display.flip()
         while(gameState == "gameOver"):
