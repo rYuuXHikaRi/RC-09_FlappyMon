@@ -39,6 +39,7 @@ fntGame = "Assets/font/FlappyBirdy.ttf"
 bgm = "Assets/sound/Game-Menu.wav"
 tap = "Assets/sound/fly.wav"
 die = "Assets/sound/die.wav"
+skillActive = "Assets/sound/powerup.wav"
 bgmStageGame = ["Assets/sound/BG-twilight.wav",
                 "Assets/sound/BG-Hellzone.wav",
                 "Assets/sound/BG-iceage.wav"]
@@ -74,7 +75,7 @@ pygame.init()
 font = pygame.font.SysFont(fntGame,45)
 white=(0,0,0 )
 screen = pygame.display.set_mode((windowW, windowH))
-pygame.display.set_caption("FlappyMon - 0.2.3-Alpha")
+pygame.display.set_caption("FlappyMon - 0.2.6-Alpha")
 clock = pygame.time.Clock()
 
 class character(pygame.sprite.Sprite, ABC) :
@@ -143,6 +144,8 @@ class poke1(character) :
                 and pokeObject.sprites()[0].rect.right<pipe_group.sprites()[0].rect.right\
                     and Pos_Detection==False:
                         Pos_Detection=True
+                        self.sound = mixer.Sound(skillActive)
+                        self.sound.play()
             if Pos_Detection== True: 
                 if pokeObject.sprites()[0].rect.left < pipe_group.sprites()[0].rect.right:
                     self.__hp+=1
@@ -176,6 +179,8 @@ class poke2(character) :
     def castSkill(self) :
         if self.score%10==0 and self.score>0:
             self.skill=True
+            self.sound = mixer.Sound(skillActive)
+            self.sound.play()
         elif((self.score-6)%10==0):
             self.skill=False
         if self.skill==True:
@@ -211,6 +216,8 @@ class poke3(character) :
         if self.score%10==0 and self.score>0 :
             self.skill=True
             self.last_hp=self.__hp
+            self.sound = mixer.Sound(skillActive)
+            self.sound.play()
         elif((self.score-6)%10==0 and self.score>10):
             self.skill=False
         if self.skill==True:
