@@ -7,6 +7,8 @@ from pygame.locals import *
 from abc import ABC, abstractmethod
 from os import path
 
+from scipy import rand
+
 
 
 # Environment Setting
@@ -352,7 +354,14 @@ while isGameRun :
     
     bgMenuGame = pygame.image.load(bgGameSprites[random.randint(0, 2)])
     bgMenuGame = pygame.transform.scale(bgMenuGame,(windowW, windowH))
+    groundMenuGame = [chikorita, fletchling, swablu]
+    groundMenuGame = groundMenuGame[random.randint(0,2)]
+    for i in range (2):
+        ground = Ground(GROUND_WIDHT * i, groundMenuGame)
+        ground_group.add(ground)
+        
     while(gameState == "menuGame") :
+        clock.tick(FPS)
         screen.blit(bgMenuGame, (0,0))
 
         menu_mouse_POS = pygame.mouse.get_pos()
@@ -363,6 +372,13 @@ while isGameRun :
         btn_play_Rect = btn_play.get_rect(center=(windowW / 2, 280))
         btn_quit = pygame.image.load(menuSprites[5])
         btn_quit_Rect = btn_quit.get_rect(center=(windowW / 2, 370))
+
+        if is_off_screen(ground_group.sprites()[0]):
+            ground_group.remove(ground_group.sprites()[0])
+            new_ground = Ground(GROUND_WIDHT - 20, groundMenuGame)
+            ground_group.add(new_ground)
+        ground_group.update()
+        ground_group.draw(screen)
 
         screen.blit(menu_Text, menu_Rect)
         screen.blit(btn_play, btn_play_Rect)
@@ -395,8 +411,15 @@ while isGameRun :
     
     bgMenuGame = pygame.image.load(bgGameSprites[random.randint(0, 2)])
     bgMenuGame = pygame.transform.scale(bgMenuGame,(windowW, windowH))
-    delay_menu = 50
+    groundMenuGame = [chikorita, fletchling, swablu]
+    groundMenuGame = groundMenuGame[random.randint(0,2)]
+    for i in range (2):
+        ground = Ground(GROUND_WIDHT * i, groundMenuGame)
+        ground_group.add(ground)
+        
+    delay_menu = 5
     while(gameState == "chooseCharacter") :
+        clock.tick(FPS)
         screen.blit(bgMenuGame, (0,0))
 
         select_mouse_POS = pygame.mouse.get_pos()
@@ -414,6 +437,13 @@ while isGameRun :
         screen.blit(btn_chiko, btn_chiko_Rect)
         screen.blit(btn_fletch, btn_fletch_Rect)
         screen.blit(btn_swab, btn_swab_Rect)
+
+        if is_off_screen(ground_group.sprites()[0]):
+            ground_group.remove(ground_group.sprites()[0])
+            new_ground = Ground(GROUND_WIDHT - 20, groundMenuGame)
+            ground_group.add(new_ground)
+        ground_group.update()
+        ground_group.draw(screen)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -484,7 +514,7 @@ while isGameRun :
                     pipe_group.add(pipes[0])
                     pipe_group.add(pipes[1])
             
-            pygame.display.update()
+        pygame.display.update()
 
     mixer.music.stop()
     for i in range(len(bgmStageGame)) :
