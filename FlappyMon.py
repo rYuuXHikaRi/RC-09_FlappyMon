@@ -56,7 +56,7 @@ baseGroundSprites = ["Assets/img/grdbase-twill.png",
                      "Assets/img/grdbase-ice.png" ]
 
 obstacleSprites = ["Assets/img/obs-twill.png",
-                   "Assets/img/obs-lava1.png",
+                   "Assets/img/obs-lava.png",
                    "Assets/img/obs-ice.png" ]
 
 hpSprites = ["Assets/img/hp1.png",
