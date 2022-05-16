@@ -30,7 +30,7 @@ gravity = 0.5
 characterSpeed = 7.5
 GAME_SPEED=15
 HighScore_File="Highscore.txt"
-HS=0
+HS=1
 
 
 # Assets
@@ -291,6 +291,11 @@ def load_Highscore(highscore):
         except:
             highscore= 0
     return highscore
+
+def change_highscore(new_hs):
+    f=open("Assets/Highscore.txt","r+")
+    f.write(str(new_hs))
+    f.close()
 
 
 
@@ -601,7 +606,11 @@ while isGameRun :
         show_text("Game Over",40,(255, 0, 0),windowW//2 - 65,windowH//4)
         show_text("Score Anda =  {}".format(charSelect.score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
         show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
-        show_text("HighScore = "+str(load_Highscore(HS)),25,(255,255,255),windowW//2 - 45,windowH//4 + 150 )
+        if charSelect.score > int(load_Highscore(HS)):
+            show_text("New Highscore = "+str(charSelect.score),25,(255,255,255),windowW//2 - 45,windowH//4 + 150 )
+            change_highscore(charSelect.score)
+        else:    
+            show_text("HighScore = "+str(load_Highscore(HS)),25,(255,255,255),windowW//2 - 45,windowH//4 + 150 )
 
         pygame.display.flip()
         while(gameState == "gameOver"):
