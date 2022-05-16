@@ -3,6 +3,7 @@ import pygame, random
 from pygame import mixer
 from pygame.locals import *
 from abc import ABC, abstractmethod
+from os import path
 
 
 
@@ -28,6 +29,8 @@ GROUND_WIDHT =2 * windowW
 gravity = 0.5
 characterSpeed = 7.5
 GAME_SPEED=15
+HighScore_File="Highscore.txt"
+HS=0
 
 
 # Assets
@@ -280,6 +283,17 @@ def show_score(text,font,color,x,y):
     img=font.render(text,True,color)
     screen.blit(img  ,(x,y))
 
+def load_Highscore(highscore):
+    dir=path.dirname(__file__)
+    with open(path.join(dir,HighScore_File),'w') as f:
+        try :
+            highscore = (int(f.read())) 
+        except:
+            highscore= 0
+    return highscore
+
+
+
 def is_off_screen(sprite):
     return sprite.rect[0] < -(sprite.rect[2])
 
@@ -527,6 +541,7 @@ while isGameRun :
             charSelect.get_score()
         show_score(str(charSelect.score),font ,(255,234,0),int(windowW/2)-30,20)
     
+    
         pygame.display.update()
         pygame.display.flip()
         if(pygame.sprite.groupcollide(pokeObject, ground_group, False,False, pygame.sprite.collide_mask)) :
@@ -586,6 +601,7 @@ while isGameRun :
         show_text("Game Over",40,(255, 0, 0),windowW//2 - 65,windowH//4)
         show_text("Score Anda =  {}".format(charSelect.score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
         show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
+        show_text("HighScore = "+str(load_Highscore(HS)),25,(255,255,255),windowW//2 - 45,windowH//4 + 150 )
 
         pygame.display.flip()
         while(gameState == "gameOver"):
