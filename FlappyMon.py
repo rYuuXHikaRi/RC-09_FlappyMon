@@ -7,7 +7,6 @@ from pygame.locals import *
 from abc import ABC, abstractmethod
 from os import path
 
-from scipy import rand
 
 
 
