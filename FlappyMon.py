@@ -190,6 +190,7 @@ class poke2(character) :
             self.skill=True
             self.sound = mixer.Sound(skillActive[1])
             self.sound.play()
+            self.score += 1
         elif((self.score-6)%10==0):
             self.skill=False
         if self.skill==True:
@@ -227,6 +228,7 @@ class poke3(character) :
             self.last_hp=self.__hp
             self.sound = mixer.Sound(skillActive[2])
             self.sound.play()
+            self.score += 1
         elif((self.score-6)%10==0 and self.score>10):
             self.skill=False
         if self.skill==True:
@@ -296,7 +298,7 @@ def load_Highscore():
     return highscore_data
 
 def change_highscore(new_hs):
-    f=open("Assets/Highscore.txt","r+")
+    f=open("./Highscore.txt","r+")
     f.write(str(new_hs))
     f.close()
 
