@@ -602,7 +602,8 @@ while isGameRun :
         if len(pipe_group)>0:
             charSelect.get_score()
         show_score(str(charSelect.score),font ,(255,234,0),int(windowW/2)-30,20)
-    
+        print("Score now = ",charSelect.score)
+        print("highest = ", load_Highscore(HighScore_File))
     
         pygame.display.update()
         pygame.display.flip()
@@ -670,8 +671,10 @@ while isGameRun :
     else :
         mixer.music.stop()
     while(gameState == "gameOver") :
-        screen.fill((0,0,0))
-        show_text("Game Over",40,(255, 0, 0),windowW//2 - 65,windowH//4)
+        screen.blit(transparentBg, (0, 0))
+        text_banner = pygame.image.load(gameInteruptScr[1][0])
+        text_banner_Rect = text_banner.get_rect(center=(windowW / 2, 100))
+        screen.blit(text_banner, text_banner_Rect)
         show_text("Score Anda =  {}".format(charSelect.score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
         show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
         if charSelect.score > int(load_Highscore(HS)):
