@@ -403,6 +403,7 @@ while isGameRun :
     if(isFromDie) :
         mixer.music.load(bgm)
         mixer.music.play(-1)
+        isFromDie = False
     while(gameState == "chooseCharacter") :
         clock.tick(FPS)
         screen.blit(bgMenuGame, (0,0))
@@ -673,9 +674,10 @@ while isGameRun :
             if event.type == QUIT :
                 gameState = "netralState"
                 isGameRun = False
-            if event.type == KEYUP:
-                gameState = "chooseCharacter"
-                isFromDie = True
+            if event.type == KEYDOWN:
+                if event.key == pygame.K_r :
+                    gameState = "chooseCharacter"
+                    isFromDie = True
         screen.blit(transparentBg, (0, 0))
         text_banner = pygame.image.load(gameInteruptScr[1][0])
         text_banner_Rect = text_banner.get_rect(center=(windowW / 2, 100))
@@ -691,6 +693,5 @@ while isGameRun :
             pygame.display.update()
             isGameOverScr = False
         clock.tick(5)
-
 
 pygame.quit()
