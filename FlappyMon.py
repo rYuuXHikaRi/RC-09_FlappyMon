@@ -1,7 +1,5 @@
-from cgi import test
-from turtle import delay
+from msilib.schema import File
 import pygame, random
-
 from pygame import mixer
 from pygame.locals import *
 from abc import ABC, abstractmethod
@@ -29,8 +27,8 @@ GROUND_WIDHT =2 * windowW
 gravity = 0.5
 characterSpeed = 7.5
 GAME_SPEED=15
-HighScore_File="Highscore.txt"
-HS=1
+HighScore_File="./Highscore.txt"
+#HS=1
 
 
 # Assets
@@ -292,18 +290,15 @@ def show_score(text,font,color,x,y):
     img=font.render(text,True,color)
     screen.blit(img  ,(x,y))
 
-def load_Highscore(highscore):
-    dir=path.dirname(__file__)
-    with open(path.join(dir,HighScore_File),'w') as f:
-        try :
-            highscore = (int(f.read())) 
-        except:
-            highscore= 0
-    return highscore
+def load_Highscore():
+    file = open(HighScore_File, "r")
+    highscore_data = int(file.read())
+    file.close()
+    return highscore_data
 
 def change_highscore(new_hs):
     f=open("Assets/Highscore.txt","r+")
-    f.write(str(new_hs))
+    f.write(int(new_hs))
     f.close()
 
 def is_off_screen(sprite):
@@ -603,7 +598,7 @@ while isGameRun :
             charSelect.get_score()
         show_score(str(charSelect.score),font ,(255,234,0),int(windowW/2)-30,20)
         print("Score now = ",charSelect.score)
-        print("highest = ", load_Highscore(HighScore_File))
+        print("highest = ", load_Highscore())
     
         pygame.display.update()
         pygame.display.flip()
@@ -677,11 +672,11 @@ while isGameRun :
         screen.blit(text_banner, text_banner_Rect)
         show_text("Score Anda =  {}".format(charSelect.score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
         show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
-        if charSelect.score > int(load_Highscore(HS)):
+        if charSelect.score > int(load_Highscore()):
             show_text("New Highscore = "+str(charSelect.score),30,(255,255,255),windowW//2 - 75,windowH//4 + 150 )
             change_highscore(charSelect.score)
         else:    
-            show_text("HighScore = "+str(load_Highscore(HS)),30,(255,255,255),windowW//2 - 55,windowH//4 + 150 )
+            show_text("HighScore = "+str(load_Highscore()),30,(255,255,255),windowW//2 - 55,windowH//4 + 150 )
 
         pygame.display.flip()
         while(gameState == "gameOver"):
