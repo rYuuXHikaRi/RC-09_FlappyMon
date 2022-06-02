@@ -1,4 +1,3 @@
-from msilib.schema import File
 import pygame, random
 from pygame import mixer
 from pygame.locals import *
@@ -225,13 +224,13 @@ class poke3(character) :
     def castSkill(self) :
         if self.score%10==0 and self.score>0 :
             self.skill=True
-            self.last_hp=self.__hp
+            #self.last_hp=self.__hp
             self.sound = mixer.Sound(skillActive[2])
             self.sound.play()
         elif((self.score-6)%10==0 and self.score>10):
             self.skill=False
         if self.skill==True:
-            self.__hp=self.last_hp    
+            self.__hp = self.__hp - 0
 
     def drownHP(self):
         self.__hp -= 1
@@ -678,6 +677,7 @@ while isGameRun :
                 if event.key == pygame.K_r :
                     gameState = "chooseCharacter"
                     isFromDie = True
+
         screen.blit(transparentBg, (0, 0))
         text_banner = pygame.image.load(gameInteruptScr[1][0])
         text_banner_Rect = text_banner.get_rect(center=(windowW / 2, 100))
