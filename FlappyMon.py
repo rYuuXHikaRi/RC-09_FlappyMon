@@ -298,7 +298,7 @@ def load_Highscore():
 
 def change_highscore(new_hs):
     f=open("Assets/Highscore.txt","r+")
-    f.write(int(new_hs))
+    f.write(str(new_hs))
     f.close()
 
 def is_off_screen(sprite):
@@ -597,8 +597,6 @@ while isGameRun :
         if len(pipe_group)>0:
             charSelect.get_score()
         show_score(str(charSelect.score),font ,(255,234,0),int(windowW/2)-30,20)
-        print("Score now = ",charSelect.score)
-        print("highest = ", load_Highscore())
     
         pygame.display.update()
         pygame.display.flip()
@@ -685,7 +683,6 @@ while isGameRun :
                 if event.type == QUIT :
                     gameState = "netralState"
                     isGameRun = False
-
                 if event.type == KEYUP:
                     gameState = "playGame"
 pygame.quit()
