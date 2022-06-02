@@ -649,12 +649,17 @@ while isGameRun :
                 elif event.key == pygame.K_q:
                     gameState = "netralState"
                     isGameRun = False
+            elif event.type == pygame.MOUSEBUTTONDOWN :
+                    mixer.music.unpause()
+                    isFromPause = True
+                    gameState = "playGame"
+
         text_banner = pygame.image.load(gameInteruptScr[0][0])
-        text_banner_Rect = text_banner.get_rect(center=(windowW / 2, 200))
+        text_banner_Rect = text_banner.get_rect(center=(windowW / 2, 100))
         screen.blit(transparentBg, (0, 0))
         screen.blit(text_banner, text_banner_Rect)
-        #show_text("Paused", 40, (255,255,255), windowW//2 -50,windowH//3)
-        show_text("Press C to continue or Q to quit.", 25, (255,255,255),windowW//8 ,windowH//2.5)
+        show_text("Press C/click screen to continue", 25, (255,255,255),windowW//8 ,windowH//2.5)
+        show_text("Press Q to exit game", 25, (255,255,255), windowW//8 ,windowH//2.5 + 20)
         while isPauseRunOnce :
             pygame.display.update()
             isPauseRunOnce = False
