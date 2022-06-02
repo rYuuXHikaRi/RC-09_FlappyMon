@@ -156,7 +156,7 @@ class poke1(character) :
                 and pokeObject.sprites()[0].rect.right<pipe_group.sprites()[0].rect.right\
                     and Pos_Detection==False:
                         Pos_Detection=True
-                        self.sound = mixer.Sound(skillActive)
+                        self.sound = mixer.Sound(skillActive[0])
                         self.sound.play()
             if Pos_Detection== True: 
                 if pokeObject.sprites()[0].rect.left < pipe_group.sprites()[0].rect.right:
@@ -191,7 +191,7 @@ class poke2(character) :
     def castSkill(self) :
         if self.score%10==0 and self.score>0:
             self.skill=True
-            self.sound = mixer.Sound(skillActive)
+            self.sound = mixer.Sound(skillActive[1])
             self.sound.play()
         elif((self.score-6)%10==0):
             self.skill=False
@@ -228,7 +228,7 @@ class poke3(character) :
         if self.score%10==0 and self.score>0 :
             self.skill=True
             self.last_hp=self.__hp
-            self.sound = mixer.Sound(skillActive)
+            self.sound = mixer.Sound(skillActive[2])
             self.sound.play()
         elif((self.score-6)%10==0 and self.score>10):
             self.skill=False
