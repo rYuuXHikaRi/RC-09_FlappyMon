@@ -7,9 +7,6 @@ from pygame.locals import *
 from abc import ABC, abstractmethod
 from os import path
 
-
-
-
 # Environment Setting
 # Sebagai "Canvas" game
 windowW = 360
@@ -45,7 +42,10 @@ fntGame = "Assets/font/FlappyBirdy.ttf"
 bgm = "Assets/sound/Game-Menu.wav"
 tap = "Assets/sound/fly.wav"
 die = "Assets/sound/die.wav"
-skillActive = "Assets/sound/powerup.wav"
+tapButton = "Assets/sound/powerup.wav"
+skillActive = ["Assets/sound/chikorita.wav",
+                "Assets/sound/fletchling.wav",
+                "Assets/sound/swablu.wav"]
 bgmStageGame = ["Assets/sound/BG-twilight.wav",
                 "Assets/sound/BG-Hellzone.wav",
                 "Assets/sound/BG-iceage.wav"]
@@ -73,6 +73,12 @@ menuSprites = ["Assets/img/menu_header_title.png",
                "Assets/img/menu_btn_start_hover.png",
                "Assets/img/menu_btn_quit_normal.png",
                "Assets/img/menu_btn_quit_hover.png"]
+charDesc = ["Assets/img/chikorita_desc.png",
+            "Assets/img/fletchling_desc.png",
+            "Assets/img/swablu_desc.png"]
+gameInteruptScr = [["Assets/img/pause_txt_bnnr.png"],
+                   ["Assets/img/gameover_txt_bnnr.png"]]
+gameStartBtn = "Assets/img/game_btn_start.png"
 transparentBg = pygame.image.load("Assets/img/bg_transparent.png")
 transparentBg = pygame.transform.scale(transparentBg, (windowW, windowH))
 
@@ -300,8 +306,6 @@ def change_highscore(new_hs):
     f.write(str(new_hs))
     f.close()
 
-
-
 def is_off_screen(sprite):
     return sprite.rect[0] < -(sprite.rect[2])
 
@@ -309,26 +313,6 @@ def show_text(text, font_size, font_colour,x,y):
     font = pygame.font.SysFont(None,font_size)
     font_surface = font.render(text, True,font_colour)
     screen.blit(font_surface,(x,y))
-
-def pause():
-    paused = True
-    
-    while paused :
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type==pygame.KEYDOWN:
-                if event.key == pygame.K_c:
-                    paused = False
-                elif event.key == pygame.K_q:
-                    pygame.quit()
-                    quit()
-        screen.fill(white)
-        show_text("Paused", 40, (255,255,255), windowW//2 -50,windowH//3)
-        show_text("Press C to continue or Q to quit.", 25, (255,255,255),windowW//8 ,windowH//2.5)
-        pygame.display.update()
-        clock.tick(5)
 
 chikorita = poke1()
 fletchling = poke2()
@@ -339,15 +323,16 @@ ground_group = pygame.sprite.Group()
 
 # Main
 isGameRun = True
+isFromPause = False
 gameState = "menuGame" # default = menuGame
 after_collide = False
 after_collide_interval = 4
+sfxButton = mixer.Sound(tapButton)
+sfxCharacter = [mixer.Sound(skillActive[0]), mixer.Sound(skillActive[1]), mixer.Sound(skillActive[2])]
 
 # Play BGM Music
 mixer.music.load(bgm)
 mixer.music.play(-1)
-
-
 
 while isGameRun :
     
@@ -398,13 +383,14 @@ while isGameRun :
                 gameState = "netralState"
                 isGameRun = False
         
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if(menu_mouse_POS[0] in range(btn_play_Rect.left, btn_play_Rect.right) and menu_mouse_POS[1] in range(btn_play_Rect.top, btn_play_Rect.bottom)) :
-                gameState = "chooseCharacter"
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if(menu_mouse_POS[0] in range(btn_play_Rect.left, btn_play_Rect.right) and menu_mouse_POS[1] in range(btn_play_Rect.top, btn_play_Rect.bottom)) :
+                    gameState = "chooseCharacter"
+                    sfxButton.play() 
         
-            if(menu_mouse_POS[0] in range(btn_quit_Rect.left, btn_quit_Rect.right) and menu_mouse_POS[1] in range(btn_quit_Rect.top, btn_quit_Rect.bottom)) :
-                gameState = "netralState"
-                isGameRun = False
+                if(menu_mouse_POS[0] in range(btn_quit_Rect.left, btn_quit_Rect.right) and menu_mouse_POS[1] in range(btn_quit_Rect.top, btn_quit_Rect.bottom)) :
+                    gameState = "netralState"
+                    isGameRun = False
 
         pygame.display.update()
     
@@ -417,6 +403,7 @@ while isGameRun :
         ground_group.add(ground)
         
     delay_menu = 5
+    isCharChoosed = False
     while(gameState == "chooseCharacter") :
         clock.tick(FPS)
         screen.blit(bgMenuGame, (0,0))
@@ -448,79 +435,109 @@ while isGameRun :
             if event.type == pygame.QUIT:
                 gameState = "netralState"
                 isGameRun = False
-        if(delay_menu > 0) :
-            delay_menu -= 1
-            print(delay_menu)
-            pygame.display.update()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
-            if(select_mouse_POS[0] in range(btn_chiko_Rect.left, btn_chiko_Rect.right) and 
-               select_mouse_POS[1] in range(btn_chiko_Rect.top, btn_chiko_Rect.bottom)) :
-                gameState = "playGame"
-                charSelect = chikorita
-                for i in range(len(bgGameSprites)) :
-                    if(i == int(charSelect.getID()) - 1) :
-                        bgGame = pygame.image.load(bgGameSprites[i])
-                        bgGame = pygame.transform.scale(bgGame,(windowW, windowH))
-                        break
-                pokeObject.add(charSelect)
-                for i in range (2):
-                    ground = Ground(GROUND_WIDHT * i,charSelect)
-                    ground_group.add(ground)
+            if(delay_menu > 0) :
+                delay_menu -= 1
+                print(delay_menu)
+                pygame.display.update()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if(select_mouse_POS[0] in range(btn_chiko_Rect.left, btn_chiko_Rect.right) and 
+                   select_mouse_POS[1] in range(btn_chiko_Rect.top, btn_chiko_Rect.bottom)) :
+                    sfxCharacter[0].play()
+                    if(isCharChoosed):
+                        pokeObject.remove(pokeObject.sprites()[0])
+                    charSelect = chikorita
+                    isCharChoosed = True
+                    for i in range(len(bgGameSprites)) :
+                        if(i == int(charSelect.getID()) - 1) :
+                            bgGame = pygame.image.load(bgGameSprites[i])
+                            bgGame = pygame.transform.scale(bgGame,(windowW, windowH))
+                            bgMenuGame = pygame.image.load(bgGameSprites[i])
+                            bgMenuGame = pygame.transform.scale(bgMenuGame,(windowW, windowH))                           
+                            break
+                    pokeObject.add(charSelect)
+                    for i in range (2):
+                        ground = Ground(GROUND_WIDHT * i,charSelect)
+                        ground_group.add(ground)
 
-                pipe_group = pygame.sprite.Group()
-                for i in range (2):
-                    pipes = get_random_pipes(windowW * i + 800, charSelect)
-                    pipe_group.add(pipes[0])
-                    pipe_group.add(pipes[1])
+                    pipe_group = pygame.sprite.Group()
+                    for i in range (2):
+                        pipes = get_random_pipes(windowW * i + 800, charSelect)
+                        pipe_group.add(pipes[0])
+                        pipe_group.add(pipes[1])
         
-            if(select_mouse_POS[0] in range(btn_fletch_Rect.left, btn_fletch_Rect.right) and 
-               select_mouse_POS[1] in range(btn_fletch_Rect.top, btn_fletch_Rect.bottom)) :
-                gameState = "playGame"
-                charSelect = fletchling
-                for i in range(len(bgGameSprites)) :
-                    if(i == int(charSelect.getID()) - 1) :
-                        bgGame = pygame.image.load(bgGameSprites[i])
-                        bgGame = pygame.transform.scale(bgGame,(windowW, windowH))
-                        break
-                pokeObject.add(charSelect)
-                for i in range (2):
-                    ground = Ground(GROUND_WIDHT * i,charSelect)
-                    ground_group.add(ground)
+                if(select_mouse_POS[0] in range(btn_fletch_Rect.left, btn_fletch_Rect.right) and 
+                   select_mouse_POS[1] in range(btn_fletch_Rect.top, btn_fletch_Rect.bottom)) :
+                    sfxCharacter[1].play()
+                    if(isCharChoosed):
+                        pokeObject.remove(pokeObject.sprites()[0])
+                    charSelect = fletchling
+                    isCharChoosed = True
+                    for i in range(len(bgGameSprites)) :
+                        if(i == int(charSelect.getID()) - 1) :
+                            bgGame = pygame.image.load(bgGameSprites[i])
+                            bgGame = pygame.transform.scale(bgGame,(windowW, windowH))
+                            bgMenuGame = pygame.image.load(bgGameSprites[i])
+                            bgMenuGame = pygame.transform.scale(bgMenuGame,(windowW, windowH))    
+                            break
+                    pokeObject.add(charSelect)
+                    for i in range (2):
+                        ground = Ground(GROUND_WIDHT * i,charSelect)
+                        ground_group.add(ground)
 
-                pipe_group = pygame.sprite.Group()
-                for i in range (2):
-                    pipes = get_random_pipes(windowW * i + 800, charSelect)
-                    pipe_group.add(pipes[0])
-                    pipe_group.add(pipes[1])
+                    pipe_group = pygame.sprite.Group()
+                    for i in range (2):
+                        pipes = get_random_pipes(windowW * i + 800, charSelect)
+                        pipe_group.add(pipes[0])
+                        pipe_group.add(pipes[1])
 
-            if(select_mouse_POS[0] in range(btn_swab_Rect.left, btn_swab_Rect.right) and 
-               select_mouse_POS[1] in range(btn_swab_Rect.top, btn_swab_Rect.bottom)) :
-                gameState = "playGame"
-                charSelect = swablu
-                for i in range(len(bgGameSprites)) :
-                    if(i == int(charSelect.getID()) - 1) :
-                        bgGame = pygame.image.load(bgGameSprites[i])
-                        bgGame = pygame.transform.scale(bgGame,(windowW, windowH))
-                        break
-                pokeObject.add(charSelect)
-                for i in range (2):
-                    ground = Ground(GROUND_WIDHT * i,charSelect)
-                    ground_group.add(ground)
+                if(select_mouse_POS[0] in range(btn_swab_Rect.left, btn_swab_Rect.right) and 
+                   select_mouse_POS[1] in range(btn_swab_Rect.top, btn_swab_Rect.bottom)) :
+                    sfxCharacter[2].play()
+                    if(isCharChoosed):
+                        pokeObject.remove(pokeObject.sprites()[0])
+                    charSelect = swablu
+                    isCharChoosed = True
+                    for i in range(len(bgGameSprites)) :
+                        if(i == int(charSelect.getID()) - 1) :
+                            bgGame = pygame.image.load(bgGameSprites[i])
+                            bgGame = pygame.transform.scale(bgGame,(windowW, windowH))
+                            bgMenuGame = pygame.image.load(bgGameSprites[i])
+                            bgMenuGame = pygame.transform.scale(bgMenuGame,(windowW, windowH))    
+                            break
+                    pokeObject.add(charSelect)
+                    for i in range (2):
+                        ground = Ground(GROUND_WIDHT * i,charSelect)
+                        ground_group.add(ground)
 
-                pipe_group = pygame.sprite.Group()
-                for i in range (2):
-                    pipes = get_random_pipes(windowW * i + 800, charSelect)
-                    pipe_group.add(pipes[0])
-                    pipe_group.add(pipes[1])
-            
+                    pipe_group = pygame.sprite.Group()
+                    for i in range (2):
+                        pipes = get_random_pipes(windowW * i + 800, charSelect)
+                        pipe_group.add(pipes[0])
+                        pipe_group.add(pipes[1])
+                
+                if(select_mouse_POS[0] in range(137, 223) and 
+                   select_mouse_POS[1] in range(448, 493)) :
+                    sfxButton.play()
+                    gameState = "playGame"
+        if(isCharChoosed) :
+            deskripsiPoke = pygame.image.load(charDesc[int(charSelect.getID())-1])
+            deskripsiPoke_Rect = deskripsiPoke.get_rect(center=(180, (windowH / 2 - 50) + 100))
+            screen.blit(deskripsiPoke,deskripsiPoke_Rect)
+            startBtn = pygame.image.load(gameStartBtn)
+            startBtn_Rect = startBtn.get_rect(center=(windowW / 2, (windowH / 2 - 50) + 200))
+            screen.blit(startBtn, startBtn_Rect)
+    
         pygame.display.update()
 
-    mixer.music.stop()
-    for i in range(len(bgmStageGame)) :
-        if(i == int(charSelect.getID()) - 1) :
-            mixer.music.load(bgmStageGame[i])
-            mixer.music.play(-1)
-            break
+    if(isFromPause) :
+        isFromPause = False
+    else :
+        mixer.music.stop()
+        for i in range(len(bgmStageGame)) :
+            if(i == int(charSelect.getID()) - 1) :
+                mixer.music.load(bgmStageGame[i])
+                mixer.music.play(-1)
+                break
     while(gameState == "playGame") :
         clock.tick(FPS)
         
@@ -534,8 +551,8 @@ while isGameRun :
                     charSelect.moveUp()
                     tap_sound = mixer.Sound(tap)
                     tap_sound.play()
-                elif event.key == pygame.K_p:
-                    #pause()
+                elif event.key == pygame.K_p or event.key == pygame.K_ESCAPE:
+                    mixer.music.pause()
                     gameState = "pauseGame"
             if(event.type == pygame.MOUSEBUTTONDOWN) :
                 charSelect.moveUp()
@@ -626,21 +643,27 @@ while isGameRun :
                 isGameRun = False
             if event.type==pygame.KEYDOWN:
                 if event.key == pygame.K_c:
+                    mixer.music.unpause()
+                    isFromPause = True
                     gameState = "playGame"
                 elif event.key == pygame.K_q:
                     gameState = "netralState"
                     isGameRun = False
-
+        text_banner = pygame.image.load(gameInteruptScr[0][0])
+        text_banner_Rect = text_banner.get_rect(center=(windowW / 2, 200))
         screen.blit(transparentBg, (0, 0))
-        show_text("Paused", 40, (255,255,255), windowW//2 -50,windowH//3)
+        screen.blit(text_banner, text_banner_Rect)
+        #show_text("Paused", 40, (255,255,255), windowW//2 -50,windowH//3)
         show_text("Press C to continue or Q to quit.", 25, (255,255,255),windowW//8 ,windowH//2.5)
         while isPauseRunOnce :
             pygame.display.update()
             isPauseRunOnce = False
-
         clock.tick(5)
 
-    mixer.music.stop()
+    if(isFromPause) :
+        continue
+    else :
+        mixer.music.stop()
     while(gameState == "gameOver") :
         screen.fill((0,0,0))
         show_text("Game Over",40,(255, 0, 0),windowW//2 - 65,windowH//4)
