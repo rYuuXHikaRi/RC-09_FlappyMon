@@ -319,6 +319,7 @@ ground_group = pygame.sprite.Group()
 # Main
 isGameRun = True
 isFromPause = False
+isFromDie = False
 gameState = "menuGame" # default = menuGame
 after_collide = False
 after_collide_interval = 4
@@ -399,6 +400,9 @@ while isGameRun :
         
     delay_menu = 5
     isCharChoosed = False
+    if(isFromDie) :
+        mixer.music.load(bgm)
+        mixer.music.play(-1)
     while(gameState == "chooseCharacter") :
         clock.tick(FPS)
         screen.blit(bgMenuGame, (0,0))
@@ -663,26 +667,30 @@ while isGameRun :
         continue
     else :
         mixer.music.stop()
+    isGameOverScr = True
     while(gameState == "gameOver") :
+        for event in pygame.event.get():
+            if event.type == QUIT :
+                gameState = "netralState"
+                isGameRun = False
+            if event.type == KEYUP:
+                gameState = "chooseCharacter"
+                isFromDie = True
         screen.blit(transparentBg, (0, 0))
         text_banner = pygame.image.load(gameInteruptScr[1][0])
         text_banner_Rect = text_banner.get_rect(center=(windowW / 2, 100))
         screen.blit(text_banner, text_banner_Rect)
         show_text("Score Anda =  {}".format(charSelect.score),25,(255,255,255),windowW//2 - 50,windowH//4 + 100)
-        show_text("Press any key to continue",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
+        show_text("Press R to Character Menu",25,(255,255,255),windowW//2 - 95,windowH//4 + 50)
         if charSelect.score > int(load_Highscore()):
             show_text("New Highscore = "+str(charSelect.score),30,(255,255,255),windowW//2 - 75,windowH//4 + 150 )
             change_highscore(charSelect.score)
         else:    
             show_text("HighScore = "+str(load_Highscore()),30,(255,255,255),windowW//2 - 55,windowH//4 + 150 )
+        while isGameOverScr :
+            pygame.display.update()
+            isGameOverScr = False
+        clock.tick(5)
 
-        pygame.display.flip()
-        while(gameState == "gameOver"):
-            clock.tick(FPS)
-            for event in pygame.event.get():
-                if event.type == QUIT :
-                    gameState = "netralState"
-                    isGameRun = False
-                if event.type == KEYUP:
-                    gameState = "playGame"
+
 pygame.quit()
